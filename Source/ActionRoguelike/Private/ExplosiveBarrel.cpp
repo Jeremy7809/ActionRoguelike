@@ -16,6 +16,7 @@ AExplosiveBarrel::AExplosiveBarrel()
 	RootComponent = StaticMeshComp;
 	StaticMeshComp->SetSimulatePhysics(true);
 	StaticMeshComp->SetCollisionProfileName(UCollisionProfile::PhysicsActor_ProfileName);
+	StaticMeshComp->OnComponentHit.AddDynamic(this,&AExplosiveBarrel::OnCompHit);
 
 	RadialForceComp = CreateDefaultSubobject<URadialForceComponent>("RadialForceComponent");
 	RadialForceComp->SetupAttachment(StaticMeshComp);
@@ -26,6 +27,15 @@ AExplosiveBarrel::AExplosiveBarrel()
 
 }
 
+
+void AExplosiveBarrel::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
+	{
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Green,FString::Printf(TEXT("I hit: %s"),*OtherActor->GetName()));
+	}
+	RadialForceComp->FireImpulse();
+}
 
 // Called when the game starts or when spawned
 void AExplosiveBarrel::BeginPlay()

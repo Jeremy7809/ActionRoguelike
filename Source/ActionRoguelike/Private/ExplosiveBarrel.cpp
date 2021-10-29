@@ -3,6 +3,7 @@
 
 #include "ExplosiveBarrel.h"
 #include "Components/StaticMeshComponent.h"
+#include "Engine/CollisionProfile.h"
 #include "PhysicsEngine/RadialForceComponent.h"
 
 // Sets default values
@@ -13,11 +14,18 @@ AExplosiveBarrel::AExplosiveBarrel()
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
 	RootComponent = StaticMeshComp;
+	StaticMeshComp->SetSimulatePhysics(true);
+	StaticMeshComp->SetCollisionProfileName(UCollisionProfile::PhysicsActor_ProfileName);
 
 	RadialForceComp = CreateDefaultSubobject<URadialForceComponent>("RadialForceComponent");
 	RadialForceComp->SetupAttachment(StaticMeshComp);
+	RadialForceComp->Radius=600.0f;
+	RadialForceComp->ImpulseStrength=2000.0f;
+	RadialForceComp->bImpulseVelChange=true;
+	RadialForceComp->SetAutoActivate(false);
 
 }
+
 
 // Called when the game starts or when spawned
 void AExplosiveBarrel::BeginPlay()

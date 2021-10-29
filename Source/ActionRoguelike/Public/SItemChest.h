@@ -4,28 +4,31 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "ExplosiveBarrel.generated.h"
-
-class UStaticMeshComponent;
-class URadialForceComponent;
+#include "SGameplayInterface.h"
+#include "SItemChest.generated.h"
 
 UCLASS()
-class ACTIONROGUELIKE_API AExplosiveBarrel : public AActor
+class ACTIONROGUELIKE_API ASItemChest : public AActor, public ISGameplayInterface
 {
 	GENERATED_BODY()
+
+	void Interact_Implementation(APawn* InstigatorPawn);
 	
-public:	
+public:
+
+	UPROPERTY(EditAnywhere)
+	float TargetPitch;
+
 	// Sets default values for this actor's properties
-	AExplosiveBarrel();
+	ASItemChest();
 
 protected:
 
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* StaticMeshComp;
+	UStaticMeshComponent* BaseMesh;
 
 	UPROPERTY(VisibleAnywhere)
-	URadialForceComponent* RadialForceComp;
-
+	UStaticMeshComponent* LidMesh;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

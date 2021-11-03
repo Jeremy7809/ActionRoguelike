@@ -3,10 +3,12 @@
 
 #include "SCharacter.h"
 
+#include "DrawDebugHelpers.h"
 #include "SInteractionComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -32,7 +34,6 @@ ASCharacter::ASCharacter()
 void ASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 // Called every frame
@@ -82,22 +83,50 @@ void ASCharacter::PrimaryAttack()
 	PlayAnimMontage(AttackAnim);
 
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, 0.2f);
-
 }
 
 void ASCharacter::PrimaryAttack_TimeElapsed()
 {
-	if(ensure(ProjectileClass))
+	if (ensure(ProjectileClass))
 	{
-		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+		FCollisionObjectQueryParams ObjectQueryParams;
+		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
 
-		FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+		FVector CamLocation = CameraComp->GetComponentLocation();
+		FRotator CamRot = CameraComp->GetComponentRotation();
+
+		FVector End = CamLocation + (CamRot.Vector() * 10000);
+
+		TArray<FHitResult> Hits;
+
+		float Radius = 30.f;
+
+		FCollisionShape Shape;
+		Shape.SetSphere(Radius);
+
+		bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, CamLocation, End, FQuat::Identity,
+		                                                       ObjectQueryParams, Shape);
+
+		FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+
+		FRotator ImpactPoint;
+		if (bBlockingHit)
+		{
+			ImpactPoint = UKismetMathLibrary::FindLookAtRotation(HandLocation, End);
+		}
+
+
+		FTransform SpawnTM = FTransform(ImpactPoint, HandLocation);
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParams.Instigator = this;
 
 		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+
+		DrawDebugLine(GetWorld(), CamLocation, End, LineColor, false, 2.0f, 0, 2.0f);
 	}
 }
 
@@ -108,4 +137,3 @@ void ASCharacter::PrimaryInteract()
 		InteractionComp->PrimaryInteract();
 	}
 }
-

@@ -82,7 +82,8 @@ void ASCharacter::PrimaryAttack()
 {
 	PlayAnimMontage(AttackAnim);
 
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed, 0.2f);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed,
+	                                0.2f);
 }
 
 void ASCharacter::PrimaryAttack_TimeElapsed()
@@ -111,12 +112,27 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 
 		FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
 
+		FVector ImpactLocation;
+		for (FHitResult Hit : Hits)
+		{
+			AActor* HitActor = Hit.GetActor();
+			if (HitActor)
+			{
+				ImpactLocation = HitActor->GetActorLocation();
+				break;
+			}
+			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.0f);
+		}
+		
 		FRotator ImpactPoint;
 		if (bBlockingHit)
 		{
+			ImpactPoint = UKismetMathLibrary::FindLookAtRotation(HandLocation, ImpactLocation);
+		}
+		else
+		{
 			ImpactPoint = UKismetMathLibrary::FindLookAtRotation(HandLocation, End);
 		}
-
 
 		FTransform SpawnTM = FTransform(ImpactPoint, HandLocation);
 
@@ -126,7 +142,8 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 
 		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 
-		DrawDebugLine(GetWorld(), CamLocation, End, LineColor, false, 2.0f, 0, 2.0f);
+		DrawDebugLine(GetWorld(), CamLocation, End, LineColor, false, 2.0f, 0,
+		              2.0f);
 	}
 }
 

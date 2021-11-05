@@ -25,6 +25,7 @@ protected:
 	TSubclassOf<AActor> ProjectileClass;
 
 	FTimerHandle TimerHandle_PrimaryAttack;
+	FTimerHandle TimerHandle_BlackholeAttack;
 
 
 public:
@@ -49,6 +50,8 @@ protected:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void PrimaryAttack();
+	void BlackholeAttack();
+	void BlackholeAttack_TimeElapsed();
 	void PrimaryAttack_TimeElapsed();
 	void PrimaryInteract();
 	

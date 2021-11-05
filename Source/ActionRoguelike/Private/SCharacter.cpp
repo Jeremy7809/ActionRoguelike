@@ -56,6 +56,7 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
+	PlayerInputComponent->BindAction("BlackholeAttack",IE_Pressed,this,&ASCharacter::BlackholeAttack);
 }
 
 void ASCharacter::MoveForward(float Value)
@@ -86,6 +87,17 @@ void ASCharacter::PrimaryAttack()
 	                                0.2f);
 }
 
+void ASCharacter::BlackholeAttack()
+{
+	GetWorldTimerManager().SetTimer(TimerHandle_BlackholeAttack, this, &ASCharacter::BlackholeAttack_TimeElapsed,
+									0.2f);
+}
+
+void ASCharacter::BlackholeAttack_TimeElapsed()
+{
+	
+}
+
 void ASCharacter::PrimaryAttack_TimeElapsed()
 {
 	if (ensure(ProjectileClass))
@@ -98,7 +110,7 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 		FVector CamLocation = CameraComp->GetComponentLocation();
 		FRotator CamRot = CameraComp->GetComponentRotation();
 
-		FVector End = CamLocation + (CamRot.Vector() * 10000);
+		FVector End = CamLocation + (CamRot.Vector() * 100000);
 
 		TArray<FHitResult> Hits;
 
@@ -118,7 +130,7 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 			AActor* HitActor = Hit.GetActor();
 			if (HitActor)
 			{
-				ImpactLocation = HitActor->GetActorLocation();
+				ImpactLocation = Hit.ImpactPoint;
 				break;
 			}
 			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.0f);

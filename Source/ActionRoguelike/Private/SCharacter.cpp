@@ -89,13 +89,32 @@ void ASCharacter::PrimaryAttack()
 
 void ASCharacter::BlackholeAttack()
 {
+	PlayAnimMontage(AttackAnim);
+	
 	GetWorldTimerManager().SetTimer(TimerHandle_BlackholeAttack, this, &ASCharacter::BlackholeAttack_TimeElapsed,
 									0.2f);
 }
 
 void ASCharacter::BlackholeAttack_TimeElapsed()
 {
-	
+	if (ensure(BlackholeProjectileClass))
+	{
+		FCollisionObjectQueryParams ObjectQueryParams;
+		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
+
+		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+		FRotator CamRot = CameraComp->GetComponentRotation();
+		
+		FTransform SpawnTM = FTransform(CamRot, HandLocation);
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = this;
+
+		GetWorld()->SpawnActor<AActor>(BlackholeProjectileClass, SpawnTM, SpawnParams);
+		
+	}
 }
 
 void ASCharacter::PrimaryAttack_TimeElapsed()

@@ -56,7 +56,8 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ASCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
-	PlayerInputComponent->BindAction("BlackholeAttack",IE_Pressed,this,&ASCharacter::BlackholeAttack);
+	PlayerInputComponent->BindAction("BlackholeAttack", IE_Pressed, this, &ASCharacter::BlackholeAttack);
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ASCharacter::Dash);
 }
 
 void ASCharacter::MoveForward(float Value)
@@ -90,10 +91,90 @@ void ASCharacter::PrimaryAttack()
 void ASCharacter::BlackholeAttack()
 {
 	PlayAnimMontage(AttackAnim);
-	
+
 	GetWorldTimerManager().SetTimer(TimerHandle_BlackholeAttack, this, &ASCharacter::BlackholeAttack_TimeElapsed,
-									0.2f);
+	                                0.2f);
 }
+
+void ASCharacter::Dash()
+{
+	PlayAnimMontage(AttackAnim);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_Explode, this, &ASCharacter::DashAttack_TimeElapsed,
+	                                0.2f);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_Explode, this, &ASCharacter::Explode_TimeElapsed,
+	                                0.2f);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_Dash, this, &ASCharacter::Dash_TimeElapsed,
+	                                0.2f);
+}
+
+void ASCharacter::DashAttack_TimeElapsed()
+{
+	if (ensure(DashProjectileClass))
+	{
+		FCollisionObjectQueryParams ObjectQueryParams;
+		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
+
+		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+		FVector CamLocation = CameraComp->GetComponentLocation();
+		FRotator CamRot = CameraComp->GetComponentRotation();
+
+		FVector End = CamLocation + (CamRot.Vector() * 100000);
+
+		TArray<FHitResult> Hits;
+
+		float Radius = 30.f;
+
+		FCollisionShape Shape;
+		Shape.SetSphere(Radius);
+
+		bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, CamLocation, End, FQuat::Identity,
+		                                                       ObjectQueryParams, Shape);
+
+		FVector ImpactLocation;
+		for (FHitResult Hit : Hits)
+		{
+			AActor* HitActor = Hit.GetActor();
+			if (HitActor)
+			{
+				ImpactLocation = Hit.ImpactPoint;
+				break;
+			}
+		}
+
+		FRotator ImpactPoint;
+		if (bBlockingHit)
+		{
+			ImpactPoint = UKismetMathLibrary::FindLookAtRotation(HandLocation, ImpactLocation);
+		}
+		else
+		{
+			ImpactPoint = UKismetMathLibrary::FindLookAtRotation(HandLocation, End);
+		}
+
+		FTransform SpawnTM = FTransform(ImpactPoint, HandLocation);
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = this;
+
+		GetWorld()->SpawnActor<AActor>(DashProjectileClass, SpawnTM, SpawnParams);
+		
+	}
+}
+
+void ASCharacter::Explode_TimeElapsed()
+{
+}
+
+
+void ASCharacter::Dash_TimeElapsed()
+{
+}
+
 
 void ASCharacter::BlackholeAttack_TimeElapsed()
 {
@@ -105,7 +186,7 @@ void ASCharacter::BlackholeAttack_TimeElapsed()
 
 		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 		FRotator CamRot = CameraComp->GetComponentRotation();
-		
+
 		FTransform SpawnTM = FTransform(CamRot, HandLocation);
 
 		FActorSpawnParameters SpawnParams;
@@ -113,7 +194,6 @@ void ASCharacter::BlackholeAttack_TimeElapsed()
 		SpawnParams.Instigator = this;
 
 		GetWorld()->SpawnActor<AActor>(BlackholeProjectileClass, SpawnTM, SpawnParams);
-		
 	}
 }
 
@@ -154,7 +234,7 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 			}
 			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.0f);
 		}
-		
+
 		FRotator ImpactPoint;
 		if (bBlockingHit)
 		{

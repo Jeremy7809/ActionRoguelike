@@ -33,8 +33,6 @@ protected:
 	FTimerHandle TimerHandle_PrimaryAttack;
 	FTimerHandle TimerHandle_BlackholeAttack;
 	FTimerHandle TimerHandle_DashAttack;
-	FTimerHandle TimerHandle_Dash;
-	FTimerHandle TimerHandle_Explode;
 
 
 public:
@@ -65,8 +63,6 @@ protected:
 	void PrimaryInteract();
 	void Dash();
 	void DashAttack_TimeElapsed();
-	void Dash_TimeElapsed();
-	void Explode_TimeElapsed();
 	
 public:	
 	// Called every frame

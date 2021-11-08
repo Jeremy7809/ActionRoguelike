@@ -100,13 +100,7 @@ void ASCharacter::Dash()
 {
 	PlayAnimMontage(AttackAnim);
 
-	GetWorldTimerManager().SetTimer(TimerHandle_Explode, this, &ASCharacter::DashAttack_TimeElapsed,
-	                                0.2f);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_Explode, this, &ASCharacter::Explode_TimeElapsed,
-	                                0.2f);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_Dash, this, &ASCharacter::Dash_TimeElapsed,
+	GetWorldTimerManager().SetTimer(TimerHandle_DashAttack, this, &ASCharacter::DashAttack_TimeElapsed,
 	                                0.2f);
 }
 
@@ -162,19 +156,8 @@ void ASCharacter::DashAttack_TimeElapsed()
 		SpawnParams.Instigator = this;
 
 		GetWorld()->SpawnActor<AActor>(DashProjectileClass, SpawnTM, SpawnParams);
-		
 	}
 }
-
-void ASCharacter::Explode_TimeElapsed()
-{
-}
-
-
-void ASCharacter::Dash_TimeElapsed()
-{
-}
-
 
 void ASCharacter::BlackholeAttack_TimeElapsed()
 {

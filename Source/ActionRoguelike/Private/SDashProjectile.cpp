@@ -56,7 +56,12 @@ void ASDashProjectile::Explode_TimeElapsed()
 
 void ASDashProjectile::Dash_TimeElapsed()
 {
-	GetInstigator()->TeleportTo(GetActorLocation(), GetInstigator()->GetActorRotation(), false, false);
+	AActor* ActorToTeleport = GetInstigator();
+	if (ensure(ActorToTeleport))
+	{
+		ActorToTeleport->TeleportTo(GetActorLocation(), GetInstigator()->GetActorRotation(), false, false);	
+	}
+	
 	Destroy();
 }
 

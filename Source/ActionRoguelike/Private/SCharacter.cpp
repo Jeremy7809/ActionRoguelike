@@ -31,6 +31,8 @@ ASCharacter::ASCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	bUseControllerRotationYaw = false;
+
+	AttackAnimDelay = 0.2f;
 }
 
 // Called when the game starts or when spawned
@@ -88,7 +90,12 @@ void ASCharacter::PrimaryAttack()
 	PlayAnimMontage(AttackAnim);
 
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed,
-	                                0.2f);
+	                                AttackAnimDelay);
+}
+
+void ASCharacter::PrimaryAttack_TimeElapsed()
+{
+	SpawnProjectile(ProjectileClass);
 }
 
 void ASCharacter::BlackholeAttack()
@@ -96,153 +103,67 @@ void ASCharacter::BlackholeAttack()
 	PlayAnimMontage(AttackAnim);
 
 	GetWorldTimerManager().SetTimer(TimerHandle_BlackholeAttack, this, &ASCharacter::BlackholeAttack_TimeElapsed,
-	                                0.2f);
+	                                AttackAnimDelay);
 }
+
+void ASCharacter::BlackholeAttack_TimeElapsed()
+{
+	SpawnProjectile(BlackholeProjectileClass);
+}
+
 
 void ASCharacter::Dash()
 {
 	PlayAnimMontage(AttackAnim);
 
-	GetWorldTimerManager().SetTimer(TimerHandle_DashAttack, this, &ASCharacter::DashAttack_TimeElapsed,
-	                                0.2f);
+	GetWorldTimerManager().SetTimer(TimerHandle_DashAttack, this, &ASCharacter::Dash_TimeElapsed,
+	                                AttackAnimDelay);
 }
 
-void ASCharacter::DashAttack_TimeElapsed()
+void ASCharacter::Dash_TimeElapsed()
 {
-	if (ensure(DashProjectileClass))
+	SpawnProjectile(DashProjectileClass);
+}
+
+
+void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
+{
+	if (ensure(ClassToSpawn))
 	{
-		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
-
 		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-		FVector CamLocation = CameraComp->GetComponentLocation();
-		FRotator CamRot = CameraComp->GetComponentRotation();
 
-		FVector End = CamLocation + (CamRot.Vector() * 100000);
-
-		TArray<FHitResult> Hits;
-
-		float Radius = 30.f;
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = this;
 
 		FCollisionShape Shape;
-		Shape.SetSphere(Radius);
+		Shape.SetSphere(20.0f);
 
-		bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, CamLocation, End, FQuat::Identity,
-		                                                       ObjectQueryParams, Shape);
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(this);
 
-		FVector ImpactLocation;
-		for (FHitResult Hit : Hits)
+		FCollisionObjectQueryParams ObjParams;
+		ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+		ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
+		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
+
+		FVector TraceStart = CameraComp->GetComponentLocation();
+
+		FVector TraceEnd = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
+
+		FHitResult Hit;
+		if (GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjParams, Shape, Params))
 		{
-			AActor* HitActor = Hit.GetActor();
-			if (HitActor)
-			{
-				ImpactLocation = Hit.ImpactPoint;
-				break;
-			}
+			TraceEnd = Hit.ImpactPoint;
 		}
 
-		FRotator ImpactPoint;
-		if (bBlockingHit)
-		{
-			ImpactPoint = UKismetMathLibrary::FindLookAtRotation(HandLocation, ImpactLocation);
-		}
-		else
-		{
-			ImpactPoint = UKismetMathLibrary::FindLookAtRotation(HandLocation, End);
-		}
+		FRotator ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
 
-		FTransform SpawnTM = FTransform(ImpactPoint, HandLocation);
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = this;
-
-		GetWorld()->SpawnActor<AActor>(DashProjectileClass, SpawnTM, SpawnParams);
+		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
+		GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTM, SpawnParams);
 	}
 }
 
-void ASCharacter::BlackholeAttack_TimeElapsed()
-{
-	if (ensure(BlackholeProjectileClass))
-	{
-		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
-
-		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-		FRotator CamRot = CameraComp->GetComponentRotation();
-
-		FTransform SpawnTM = FTransform(CamRot, HandLocation);
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = this;
-
-		GetWorld()->SpawnActor<AActor>(BlackholeProjectileClass, SpawnTM, SpawnParams);
-	}
-}
-
-void ASCharacter::PrimaryAttack_TimeElapsed()
-{
-	if (ensure(ProjectileClass))
-	{
-		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-		ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldStatic);
-
-		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-		FVector CamLocation = CameraComp->GetComponentLocation();
-		FRotator CamRot = CameraComp->GetComponentRotation();
-
-		FVector End = CamLocation + (CamRot.Vector() * 100000);
-
-		TArray<FHitResult> Hits;
-
-		float Radius = 30.f;
-
-		FCollisionShape Shape;
-		Shape.SetSphere(Radius);
-
-		bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, CamLocation, End, FQuat::Identity,
-		                                                       ObjectQueryParams, Shape);
-
-		FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
-
-		FVector ImpactLocation;
-		for (FHitResult Hit : Hits)
-		{
-			AActor* HitActor = Hit.GetActor();
-			if (HitActor)
-			{
-				ImpactLocation = Hit.ImpactPoint;
-				break;
-			}
-			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.0f);
-		}
-
-		FRotator ImpactPoint;
-		if (bBlockingHit)
-		{
-			ImpactPoint = UKismetMathLibrary::FindLookAtRotation(HandLocation, ImpactLocation);
-		}
-		else
-		{
-			ImpactPoint = UKismetMathLibrary::FindLookAtRotation(HandLocation, End);
-		}
-
-		FTransform SpawnTM = FTransform(ImpactPoint, HandLocation);
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = this;
-
-		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
-
-		DrawDebugLine(GetWorld(), CamLocation, End, LineColor, false, 2.0f, 0,
-		              2.0f);
-	}
-}
 
 void ASCharacter::PrimaryInteract()
 {

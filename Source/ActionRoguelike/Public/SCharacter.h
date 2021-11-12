@@ -35,6 +35,7 @@ protected:
 	FTimerHandle TimerHandle_PrimaryAttack;
 	FTimerHandle TimerHandle_BlackholeAttack;
 	FTimerHandle TimerHandle_DashAttack;
+	float AttackAnimDelay;
 
 
 public:
@@ -58,7 +59,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-
+	UFUNCTION()
+	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
+	
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 	void PrimaryAttack();
@@ -67,7 +70,7 @@ protected:
 	void PrimaryAttack_TimeElapsed();
 	void PrimaryInteract();
 	void Dash();
-	void DashAttack_TimeElapsed();
+	void Dash_TimeElapsed();
 	
 public:	
 	// Called every frame

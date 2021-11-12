@@ -2,7 +2,6 @@
 
 
 #include "SDashProjectile.h"
-#include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -10,23 +9,10 @@
 // Sets default values
 ASDashProjectile::ASDashProjectile()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	TeleportDelay = 0.2f;
+	DetonateDelay = 0.2f;
 
-	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
-	SphereComp->SetCollisionProfileName("Projectile");
-	RootComponent = SphereComp;
-
-	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
-	EffectComp->SetupAttachment(SphereComp);
-
-	ExplodeEffectComp = CreateDefaultSubobject<UParticleSystemComponent>("ExplodeEffectComp");
-	ExplodeEffectComp->SetupAttachment(SphereComp);
-
-	MovementComp = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComp");
-	MovementComp->InitialSpeed = 6000.0f;
-	MovementComp->bRotationFollowsVelocity = true;
-	MovementComp->bInitialVelocityInLocalSpace = true;
+	MovementComp->InitialSpeed = 6000.f;
 }
 
 // Called when the game starts or when spawned
@@ -34,41 +20,31 @@ void ASDashProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GetWorldTimerManager().SetTimer(TimerHandle_Explode, this, &ASDashProjectile::Explode_TimeElapsed,
-	                                0.2f);
+	GetWorldTimerManager().SetTimer(TimerHandle_DelayedDetonate, this, &ASDashProjectile::Explode,
+	                                DetonateDelay);
 }
 
-// Called every frame
-void ASDashProjectile::Tick(float DeltaTime)
+void ASDashProjectile::Explode_Implementation()
 {
-	Super::Tick(DeltaTime);
-}
+	GetWorldTimerManager().ClearTimer(TimerHandle_DelayedDetonate);
 
-void ASDashProjectile::Explode_TimeElapsed()
-{
+	UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
+
+	EffectComp->DeactivateSystem();
+
 	MovementComp->StopMovementImmediately();
-	UGameplayStatics::SpawnEmitterAtLocation(this, ExplodeEffectComp->Template, GetActorLocation(), GetActorRotation(),
-	                                         GetActorScale(), true, EPSCPoolMethod::None, true);
+	SetActorEnableCollision(false);
 
-	GetWorldTimerManager().SetTimer(TimerHandle_Dash, this, &ASDashProjectile::Dash_TimeElapsed,
-	                                0.2f);
+	FTimerHandle TimerHandle_DelayedTeleport;
+	GetWorldTimerManager().SetTimer(TimerHandle_DelayedTeleport, this, &ASDashProjectile::TeleportInstigator,
+	                                TeleportDelay);
 }
 
-void ASDashProjectile::Dash_TimeElapsed()
+void ASDashProjectile::TeleportInstigator()
 {
 	AActor* ActorToTeleport = GetInstigator();
 	if (ensure(ActorToTeleport))
 	{
-		ActorToTeleport->TeleportTo(GetActorLocation(), GetInstigator()->GetActorRotation(), false, false);	
+		ActorToTeleport->TeleportTo(GetActorLocation(), ActorToTeleport->GetActorRotation(), false, false);
 	}
-	
-	Destroy();
-}
-
-
-void ASDashProjectile::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-                                 FVector NormalImpulse, const FHitResult& Hit)
-{
-	TimerHandle_Explode.Invalidate();
-	Explode_TimeElapsed();
 }

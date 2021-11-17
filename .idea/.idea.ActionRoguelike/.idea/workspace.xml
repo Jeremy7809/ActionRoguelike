@@ -10,9 +10,14 @@
   <component name="ChangeListManager">
     <list default="true" id="62f54617-099c-4127-9152-81b0785c04e5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ActionRoguelike/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ActionRoguelike/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/ActionRoguelike/Projectiles/MagicProjectileBP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ActionRoguelike/Projectiles/MagicProjectileBP.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SMagicProjectile.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SMagicProjectile.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Public/SBaseProjectile.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Public/SBaseProjectile.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/ActionRoguelike/Materials/MF_HitFlashDemo.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ActionRoguelike/Materials/MF_HitFlashDemo.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/ActionRoguelike/Materials/MI_HitFlashDemo_Inst.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ActionRoguelike/Materials/MI_HitFlashDemo_Inst.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/ActionRoguelike/Materials/M_HitFlashDemo.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ActionRoguelike/Materials/M_HitFlashDemo.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/ActionRoguelike/Materials/M_SineWave.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ActionRoguelike/Materials/M_SineWave.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/ExampleContent/Materials/MI_CharacterSimple_Inst.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ExampleContent/Materials/MI_CharacterSimple_Inst.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/ExampleContent/Materials/M_CharacterSimple.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ExampleContent/Materials/M_CharacterSimple.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SBaseProjectile.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SBaseProjectile.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SCharacter.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,9 +34,6 @@
       <filtered-out-file-type name="TAG" />
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
-  </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="20N1qBAgICw3BM4Tgua7oXWSp4w" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -294,6 +296,7 @@
       <workItem from="1636930170212" duration="655000" />
       <workItem from="1637063562033" duration="1483000" />
       <workItem from="1637113201713" duration="3081000" />
+      <workItem from="1637142896095" duration="5364000" />
     </task>
     <servers />
   </component>

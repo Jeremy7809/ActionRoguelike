@@ -34,6 +34,11 @@ ASBaseProjectile::ASBaseProjectile()
 void ASBaseProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	Explode();
+	if (OtherActor)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSFX, OtherActor->GetActorLocation(), GetActorRotation(),
+											  1.f, 1.f, 0.f, nullptr, nullptr, nullptr);
+	}
 }
 
 void ASBaseProjectile::Explode_Implementation()

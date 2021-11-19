@@ -9,11 +9,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="62f54617-099c-4127-9152-81b0785c04e5" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.ActionRoguelike/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ActionRoguelike/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/ActionRoguelike/Maps/TestLevel.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ActionRoguelike/Maps/TestLevel.umap" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/ActionRoguelike/TargetDummyBP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ActionRoguelike/TargetDummyBP.uasset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/ActionRoguelike/UI/DamagePopup_Widget.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ActionRoguelike/UI/DamagePopup_Widget.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SAttributeComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SAttributeComponent.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -295,6 +292,7 @@
       <workItem from="1637142896095" duration="5364000" />
       <workItem from="1637193612483" duration="2382000" />
       <workItem from="1637240810973" duration="691000" />
+      <workItem from="1637326744861" duration="653000" />
     </task>
     <servers />
   </component>

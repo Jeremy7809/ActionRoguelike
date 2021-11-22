@@ -11,6 +11,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class USInteractionComponent;
 class USAttributeComponent;
+class UParticleSystemComponent;
 class UAnimMontage;
 
 UCLASS()
@@ -31,6 +32,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> DashProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	UParticleSystem* CastVFX;
 	
 	FTimerHandle TimerHandle_PrimaryAttack;
 	FTimerHandle TimerHandle_BlackholeAttack;

@@ -24,6 +24,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	USoundBase* ImpactSFX;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	TSubclassOf<UCameraShake> CamShake;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USphereComponent* SphereComp;
 

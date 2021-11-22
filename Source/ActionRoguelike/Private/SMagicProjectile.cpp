@@ -27,6 +27,9 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 		Explode();
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSFX, OtherActor->GetActorLocation(), GetActorRotation(),
 		                                      1.f, 1.f, 0.f, nullptr, nullptr, nullptr);
+		if (ensure(CamShake))
+			UGameplayStatics::PlayWorldCameraShake(GetWorld(), CamShake, OtherActor->GetActorLocation(), 0.f, 50000.f, 1,
+			                                       false);
 		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(
 			OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
 		if (AttributeComp)

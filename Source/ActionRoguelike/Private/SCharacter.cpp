@@ -9,6 +9,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -102,6 +103,14 @@ void ASCharacter::PrimaryAttack()
 
 void ASCharacter::PrimaryAttack_TimeElapsed()
 {
+	if (ensure(CastVFX))
+	{
+		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+		UGameplayStatics::SpawnEmitterAttached(CastVFX, GetMesh(), NAME_None, HandLocation, HandLocation.Rotation(),
+		                                       FVector(1), EAttachLocation::KeepWorldPosition, true,
+		                                       EPSCPoolMethod::None,
+		                                       true);
+	}
 	SpawnProjectile(ProjectileClass);
 }
 
@@ -133,11 +142,11 @@ void ASCharacter::Dash_TimeElapsed()
 }
 
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth,
-	float Delta)
+                                  float Delta)
 {
 	if (Delta < 0)
 	{
-		GetMesh()->SetScalarParameterValueOnMaterials("TimeToHit",GetWorld()->TimeSeconds);
+		GetMesh()->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
 	}
 	if (NewHealth <= 0.0f && Delta < 0.0f)
 	{

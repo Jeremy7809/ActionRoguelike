@@ -38,6 +38,9 @@ void ASBaseProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* Oth
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSFX, OtherActor->GetActorLocation(), GetActorRotation(),
 											  1.f, 1.f, 0.f, nullptr, nullptr, nullptr);
+		if (ensure(CamShake))
+			UGameplayStatics::PlayWorldCameraShake(GetWorld(), CamShake, OtherActor->GetActorLocation(), 0.f, 50000.f, 1,
+												   false);
 	}
 }
 

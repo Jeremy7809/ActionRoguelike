@@ -11,7 +11,8 @@
     <list default="true" id="62f54617-099c-4127-9152-81b0785c04e5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ActionRoguelike/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ActionRoguelike/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/ActionRoguelike/AI/MinionRanged_BT.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ActionRoguelike/AI/MinionRanged_BT.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/ActionRoguelike/Projectiles/MagicProjectileBP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ActionRoguelike/Projectiles/MagicProjectileBP.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Private/AI/SBTTask_RangedAttack.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Private/AI/SBTTask_RangedAttack.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SBaseProjectile.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SBaseProjectile.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SMagicProjectile.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SMagicProjectile.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -29,15 +30,6 @@
       <filtered-out-file-type name="TAG" />
       <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
     </file-type-list>
-  </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock:///Dummy.cpp" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="20N1qBAgICw3BM4Tgua7oXWSp4w" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -308,6 +300,7 @@
       <workItem from="1637508941621" duration="2849000" />
       <workItem from="1637541414872" duration="4109000" />
       <workItem from="1637622241913" duration="7311000" />
+      <workItem from="1637641968206" duration="1857000" />
     </task>
     <servers />
   </component>

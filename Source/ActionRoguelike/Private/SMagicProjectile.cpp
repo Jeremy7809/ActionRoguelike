@@ -35,7 +35,7 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 			OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
 		if (AttributeComp)
 		{
-			AttributeComp->ApplyHealthChange(-20.0f);
+			AttributeComp->ApplyHealthChange(-5.0f);
 
 			Destroy();
 		}
@@ -46,8 +46,6 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 void ASMagicProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-
-	SphereComp->IgnoreActorWhenMoving(GetInstigator(),true);
 }
 
 // Called every frame

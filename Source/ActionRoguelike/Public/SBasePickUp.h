@@ -7,12 +7,12 @@
 #include "GameFramework/Actor.h"
 #include "SBasePickUp.generated.h"
 
+class USphereComponent;
+
 UCLASS()
 class ACTIONROGUELIKE_API ASBasePickUp : public AActor, public ISGameplayInterface
 {
 	GENERATED_BODY()
-
-	void Interact_Implementation(APawn* InstigatorPawn);
 
 protected:
 	bool Active;
@@ -20,24 +20,26 @@ protected:
 	FTimerHandle TimerHandle_Activate;
 	
 public:	
-	// Sets default values for this actor's properties
+
+	void Interact_Implementation(APawn* InstigatorPawn) override;
+	
 	ASBasePickUp();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* MeshComp;
-	
-	void Deactivate();
-	
-	void Deactivate_TimeElapsed();
+	UPROPERTY(EditAnywhere, Category="PowerUp")
+	float RespawnTime;
 
-	bool IsActive();
-	
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	FTimerHandle TimerHandle_RespawnTimer;
+
+	UFUNCTION()
+	void ShowPowerUp();
+
+	void HideAndCooldownPowerUp();
+
+	void SetPowerUpState(bool bNewIsActive);
+
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	USphereComponent* SphereComp;
 
 };

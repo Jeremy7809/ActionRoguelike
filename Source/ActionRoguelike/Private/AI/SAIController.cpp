@@ -12,7 +12,7 @@ void ASAIController::BeginPlay()
 
 	if (ensureMsgf(BehaviorTree,
 	               TEXT("Behavior Tree is null pointer! Please assign Behavior Tree in your AI Controller.")))
-	{63+2
+	{
 		RunBehaviorTree(BehaviorTree);
 	}
 

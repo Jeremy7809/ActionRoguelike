@@ -60,6 +60,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category= "Components")
 	USAttributeComponent* AttributeComp;
 
+	UPROPERTY(VisibleAnywhere, Category="Effects")
+	FName HandSocketName;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 

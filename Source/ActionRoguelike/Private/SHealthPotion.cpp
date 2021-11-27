@@ -9,33 +9,26 @@
 // Sets default values
 ASHealthPotion::ASHealthPotion()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>("MeshComp");
+	//Disable collision, instead we use SphereComp to handle interaction queries
+	MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MeshComp->SetupAttachment(RootComponent);
 }
 
-// Called when the game starts or when spawned
-void ASHealthPotion::BeginPlay()
+void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
-	Super::BeginPlay();
-}
+	if (!ensure(InstigatorPawn))
+	{
+		return;
+	}
 
-void ASBasePickUp::Interact_Implementation(APawn* InstigatorPawn)
-{
 	USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(
 		InstigatorPawn->GetComponentByClass(USAttributeComponent::StaticClass()));
-	if (AttributeComp)
+	if (ensure(AttributeComp) && !AttributeComp->HealthMaxed())
 	{
-		if (!AttributeComp->HealthMaxed() && IsActive())
+		if (AttributeComp->ApplyHealthChange(20.f))
 		{
-			AttributeComp->ApplyHealthChange(20.f);
-
-			Deactivate();
+			HideAndCooldownPowerUp();
 		}
-	}
-}
-
-// Called every frame
-void ASHealthPotion::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	} 
 }

@@ -34,6 +34,7 @@ ASCharacter::ASCharacter()
 	bUseControllerRotationYaw = false;
 
 	AttackAnimDelay = 0.2f;
+	HandSocketName = "Muzzle_01";
 }
 
 void ASCharacter::PostInitializeComponents()
@@ -105,11 +106,8 @@ void ASCharacter::PrimaryAttack_TimeElapsed()
 {
 	if (ensure(CastVFX))
 	{
-		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-		UGameplayStatics::SpawnEmitterAttached(CastVFX, GetMesh(), NAME_None, HandLocation, HandLocation.Rotation(),
-		                                       FVector(1), EAttachLocation::KeepWorldPosition, true,
-		                                       EPSCPoolMethod::None,
-		                                       true);
+		UGameplayStatics::SpawnEmitterAttached(CastVFX, GetMesh(), HandSocketName, FVector::ZeroVector,
+		                                       FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
 	}
 	SpawnProjectile(ProjectileClass);
 }
@@ -160,7 +158,7 @@ void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
 {
 	if (ensure(ClassToSpawn))
 	{
-		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+		FVector HandLocation = GetMesh()->GetSocketLocation(HandSocketName);
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

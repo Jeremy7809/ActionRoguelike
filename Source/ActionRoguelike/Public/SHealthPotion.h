@@ -6,21 +6,21 @@
 #include "SBasePickUp.h"
 #include "SHealthPotion.generated.h"
 
+class UStaticMeshComponent;
+
 UCLASS()
 class ACTIONROGUELIKE_API ASHealthPotion : public ASBasePickUp
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ASHealthPotion();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* MeshComp;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+public:
+	void Interact_Implementation(APawn* InstigatorPawn) override;
 };

@@ -2,50 +2,39 @@
 
 
 #include "SBasePickUp.h"
-#include "Components/StaticMeshComponent.h"
+#include "Components/SphereComponent.h"
 
 // Sets default values
 ASBasePickUp::ASBasePickUp()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComp");
+	SphereComp->SetCollisionProfileName("PowerUp");
+	RootComponent = SphereComp;
 
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
-	RootComponent = MeshComp;
-
-	ActivateDelay = 10.f;
-	Active = true;
+	RespawnTime = 10.f;
 }
 
-// Called when the game starts or when spawned
-void ASBasePickUp::BeginPlay()
+void ASBasePickUp::Interact_Implementation(APawn* InstigatorPawn)
 {
-	Super::BeginPlay();
+	//logic derived in classes
 }
 
-
-void ASBasePickUp::Deactivate()
+void ASBasePickUp::ShowPowerUp()
 {
-	MeshComp->SetVisibility(false);
-	Active = false;
-
-	GetWorldTimerManager().SetTimer(TimerHandle_Activate, this, &ASBasePickUp::Deactivate_TimeElapsed, ActivateDelay);
+	SetPowerUpState(true);
 }
 
-void ASBasePickUp::Deactivate_TimeElapsed()
+void ASBasePickUp::HideAndCooldownPowerUp()
 {
-	MeshComp->SetVisibility(true);
-	Active = true;
+	SetPowerUpState(false);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_RespawnTimer, this, &ASBasePickUp::ShowPowerUp, RespawnTime);
 }
 
-
-bool ASBasePickUp::IsActive()
+void ASBasePickUp::SetPowerUpState(bool bNewIsActive)
 {
-	return Active;
-}
+	SetActorEnableCollision(bNewIsActive);
 
-// Called every frame
-void ASBasePickUp::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	//Set visibility on root and all children
+	RootComponent->SetVisibility(bNewIsActive, true);
 }

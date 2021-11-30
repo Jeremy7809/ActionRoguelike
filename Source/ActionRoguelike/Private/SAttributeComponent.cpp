@@ -20,6 +20,16 @@ bool USAttributeComponent::HealthMaxed() const
 	return Health == HealthMax;
 }
 
+bool USAttributeComponent::HealthLow() const
+{
+	return Health < HealthMax * 0.5f;
+}
+
+void USAttributeComponent::FullHeal()
+{
+	Health = HealthMax;
+}
+
 bool USAttributeComponent::ApplyHealthChange(float Delta)
 {
 	float OldHealth = Health;

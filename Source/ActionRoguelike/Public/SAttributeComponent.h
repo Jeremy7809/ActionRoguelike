@@ -33,6 +33,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool HealthMaxed() const;
+
+	UFUNCTION(BlueprintCallable)
+	bool HealthLow() const;
+
+	UFUNCTION(BlueprintCallable)
+	void FullHeal();
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;

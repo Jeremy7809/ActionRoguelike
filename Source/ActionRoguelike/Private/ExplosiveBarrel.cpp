@@ -11,8 +11,6 @@
 // Sets default values
 AExplosiveBarrel::AExplosiveBarrel()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComp = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComp");
 	RootComponent = StaticMeshComp;
@@ -46,16 +44,4 @@ void AExplosiveBarrel::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 
 	FString CombinedString = FString::Printf(TEXT("Hit at location: %s"),*Hit.ImpactPoint.ToString());
 	DrawDebugString(GetWorld(),Hit.ImpactPoint,CombinedString,nullptr,FColor::Green,2.0f,true);
-}
-
-// Called when the game starts or when spawned
-void AExplosiveBarrel::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-// Called every frame
-void AExplosiveBarrel::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }

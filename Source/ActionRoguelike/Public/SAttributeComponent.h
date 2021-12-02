@@ -35,6 +35,10 @@ protected:
 	// HealthMax, Stamina, Strength
 
 public:
+
+	UFUNCTION(BlueprintCallable)
+	bool Kill(AActor* InstigatorActor);
+	
 	UFUNCTION(BlueprintCallable)
 	bool IsAlive() const;
 
@@ -45,7 +49,7 @@ public:
 	bool HealthLow() const;
 
 	UFUNCTION(BlueprintCallable)
-	void FullHeal();
+	float GetHealthMax() const;
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;

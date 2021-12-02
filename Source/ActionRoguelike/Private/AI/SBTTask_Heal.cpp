@@ -9,25 +9,16 @@
 
 EBTNodeResult::Type USBTTask_Heal::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	AAIController* MyController = OwnerComp.GetAIOwner();
-	if (ensure(MyController))
+	APawn* MyPawn = Cast<APawn>(OwnerComp.GetAIOwner()->GetPawn());
+	if (MyPawn == nullptr)
 	{
-		ACharacter* MyPawn = Cast<ACharacter>(MyController->GetPawn());
-		if (MyPawn == nullptr)
-		{
-			return EBTNodeResult::Failed;
-		}
-		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(
-			MyPawn->GetComponentByClass(USAttributeComponent::StaticClass()));
-		if (AttributeComp == nullptr)
-		{
-			return EBTNodeResult::Failed;
-		}
-		
-		AttributeComp->FullHeal();
-
-		return AttributeComp->HealthMaxed() ? EBTNodeResult::Succeeded : EBTNodeResult::Failed;
+		return EBTNodeResult::Failed;
+	}
+	USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(MyPawn);
+	if (ensure(AttributeComp))
+	{
+		AttributeComp->ApplyHealthChange(MyPawn, AttributeComp->GetHealthMax());
 	}
 
-	return EBTNodeResult::Failed;
+	return EBTNodeResult::Succeeded;
 }

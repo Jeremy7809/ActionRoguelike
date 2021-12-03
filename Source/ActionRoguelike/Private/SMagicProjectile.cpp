@@ -4,6 +4,7 @@
 #include "SMagicProjectile.h"
 
 #include "SAttributeComponent.h"
+#include "SGameplayFunctionLibrary.h"
 #include "CollisionAnalyzer/Public/ICollisionAnalyzer.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -24,19 +25,27 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
-		Explode();
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSFX, OtherActor->GetActorLocation(), GetActorRotation(),
-		                                      1.f, 1.f, 0.f, nullptr, nullptr, nullptr);
-		if (ensure(CamShake))
-			UGameplayStatics::PlayWorldCameraShake(GetWorld(), CamShake, OtherActor->GetActorLocation(), 0.f, 50000.f, 1,
-			                                       false);
-		USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(
-			OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
+		/*Explode();
+		
+		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(OtherActor);
 		if (AttributeComp)
 		{
 			AttributeComp->ApplyHealthChange(GetInstigator(), -ProjectileDamage);
 
 			Destroy();
+		}*/
+
+		if (USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, ProjectileDamage,
+		                                                      SweepResult))
+		{
+			Explode();
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ImpactSFX, OtherActor->GetActorLocation(),
+			                                      GetActorRotation(),
+			                                      1.f, 1.f, 0.f, nullptr, nullptr, nullptr);
+			if (ensure(CamShake))
+				UGameplayStatics::PlayWorldCameraShake(GetWorld(), CamShake, OtherActor->GetActorLocation(), 0.f,
+				                                       50000.f, 1,
+				                                       false);
 		}
 	}
 }

@@ -34,11 +34,35 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	float SpawnTimerInterval;
 
+	UPROPERTY(EditDefaultsOnly, Category= "PickUps")
+	TSubclassOf<AActor> HealthPUClass;
+
+	UPROPERTY(EditDefaultsOnly, Category= "PickUps")
+	TSubclassOf<AActor> CoinPUClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PickUps")
+	UEnvQuery* SpawnPUQuery;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PickUps")
+	int32 SpawnPUCount;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PickUps")
+	FVector SpawnOffset;
+	
+	UFUNCTION()
+	void SpawnPickUps();
+	
 	UFUNCTION()
 	void SpawnBotTimerElapsed();
 
 	UFUNCTION()
-	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+	void OnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+
+	UFUNCTION()
+	void OnHealthPUQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+
+	UFUNCTION()
+	void OnCoinPUQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
 	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);

@@ -19,6 +19,7 @@ static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT
 ASGameModeBase::ASGameModeBase()
 {
 	SpawnTimerInterval = 2.0f;
+	SpawnPUCount = 10;
 }
 
 void ASGameModeBase::StartPlay()
@@ -29,6 +30,8 @@ void ASGameModeBase::StartPlay()
 	//Actual amount of bots and whether its allowed to spawn determined by spawn logic later in the chain...
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ASGameModeBase::SpawnBotTimerElapsed,
 	                                SpawnTimerInterval, true);
+
+	SpawnPickUps();
 }
 
 void ASGameModeBase::KillAll()
@@ -40,6 +43,31 @@ void ASGameModeBase::KillAll()
 		if (ensure(AttributeComp) && AttributeComp->IsAlive())
 		{
 			AttributeComp->Kill(this); // pass in player? for kill credit
+		}
+	}
+}
+
+void ASGameModeBase::SpawnPickUps()
+{
+	for (int32 NrOfSpawnedPUs = 0; NrOfSpawnedPUs < SpawnPUCount; NrOfSpawnedPUs++)
+	{
+		if (NrOfSpawnedPUs < 3)
+		{
+			UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(
+				this, SpawnPUQuery, this, EEnvQueryRunMode::RandomBest25Pct, nullptr);
+			if (ensure(QueryInstance))
+			{
+				QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnHealthPUQueryCompleted);
+			}
+		}
+		else
+		{
+			UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(
+				this, SpawnPUQuery, this, EEnvQueryRunMode::RandomBest25Pct, nullptr);
+			if (ensure(QueryInstance))
+			{
+				QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnCoinPUQueryCompleted);
+			}
 		}
 	}
 }
@@ -82,12 +110,12 @@ void ASGameModeBase::SpawnBotTimerElapsed()
 		this, SpawnBotQuery, this, EEnvQueryRunMode::RandomBest5Pct, nullptr);
 	if (ensure(QueryInstance))
 	{
-		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnQueryCompleted);
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnBotQueryCompleted);
 	}
 }
 
-void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
-                                      EEnvQueryStatus::Type QueryStatus)
+void ASGameModeBase::OnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
+                                         EEnvQueryStatus::Type QueryStatus)
 {
 	if (QueryStatus != EEnvQueryStatus::Success)
 	{
@@ -104,6 +132,45 @@ void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 		DrawDebugSphere(GetWorld(), Locations[0], 50.0f, 20, FColor::Blue, false, 60.0f);
 	}
 }
+
+void ASGameModeBase::OnHealthPUQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
+                                              EEnvQueryStatus::Type QueryStatus)
+{
+	if (QueryStatus != EEnvQueryStatus::Success)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawn Health Pick Up EQS Query Failed!"))
+		return;
+	}
+
+	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
+	if (Locations.IsValidIndex(0))
+	{
+		GetWorld()->SpawnActor<AActor>(HealthPUClass, Locations[0] + SpawnOffset, FRotator::ZeroRotator);
+
+		//Track all the used spawn locations
+		DrawDebugSphere(GetWorld(), Locations[0], 50.0f, 20, FColor::Green, false, 60.0f);
+	}
+}
+
+void ASGameModeBase::OnCoinPUQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
+                                            EEnvQueryStatus::Type QueryStatus)
+{
+	if (QueryStatus != EEnvQueryStatus::Success)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spawn Coin Pick Up EQS Query Failed!"))
+		return;
+	}
+
+	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
+	if (Locations.IsValidIndex(0))
+	{
+		GetWorld()->SpawnActor<AActor>(CoinPUClass, Locations[0] + SpawnOffset, FRotator::ZeroRotator);
+
+		//Track all the used spawn locations
+		DrawDebugSphere(GetWorld(), Locations[0], 50.0f, 20, FColor::Green, false, 60.0f);
+	}
+}
+
 
 void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 {

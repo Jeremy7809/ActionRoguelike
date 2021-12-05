@@ -13,5 +13,10 @@ UCLASS()
 class ACTIONROGUELIKE_API ASCoinPickUp : public ASBasePickUp
 {
 	GENERATED_BODY()
+
+public:
+
+	ASCoinPickUp();
 	
+	void Interact_Implementation(APawn* InstigatorPawn) override;
 };

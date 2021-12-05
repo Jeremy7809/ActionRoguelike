@@ -16,11 +16,6 @@ class ACTIONROGUELIKE_API ASHealthPotion : public ASBasePickUp
 public:
 	// Sets default values for this actor's properties
 	ASHealthPotion();
-
-protected:
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* MeshComp;
-
-public:
+	
 	void Interact_Implementation(APawn* InstigatorPawn) override;
 };

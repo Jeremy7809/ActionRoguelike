@@ -39,6 +39,9 @@ protected:
 
 	void SetPowerUpState(bool bNewIsActive);
 
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* MeshComp;
+	
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	USphereComponent* SphereComp;
 

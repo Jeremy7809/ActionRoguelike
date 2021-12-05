@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SAttributeComponent.h"
+
 #include "GameFramework/Character.h"
 #include "SCharacter.generated.h"
 
@@ -11,6 +11,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class USInteractionComponent;
 class USAttributeComponent;
+class USActionComponent;
 class UParticleSystemComponent;
 class UAnimMontage;
 class ASPlayerState;
@@ -61,6 +62,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category= "Components")
 	USAttributeComponent* AttributeComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category= "Components")
+	USActionComponent* ActionComp;
+
 	UPROPERTY(VisibleAnywhere, Category="Effects")
 	FName HandSocketName;
 
@@ -72,6 +76,8 @@ protected:
 	
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+	void SprintStart();
+	void SprintStop();
 	void PrimaryAttack();
 	void BlackholeAttack();
 	void BlackholeAttack_TimeElapsed();

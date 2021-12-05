@@ -7,6 +7,7 @@
 #include "EngineUtils.h"
 #include "SAttributeComponent.h"
 #include "SCharacter.h"
+#include "SPlayerState.h"
 #include "AI/SAICharacter.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "EnvironmentQuery/EnvQueryTypes.h"
@@ -106,16 +107,30 @@ void ASGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryIn
 
 void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 {
-	ASCharacter* Player = Cast<ASCharacter>(VictimActor);
-	if (Player)
+	ASCharacter* PlayerVic = Cast<ASCharacter>(VictimActor);
+	ASAICharacter* AIEnemyVic = Cast<ASAICharacter>(VictimActor);
+	ASCharacter* PlayerKiller = Cast<ASCharacter>(Killer);
+
+	if (PlayerVic)
 	{
 		FTimerHandle TimerHandle_RespawnDelay;
 
 		FTimerDelegate Delegate;
-		Delegate.BindUFunction(this, "RespawnPlayerElapsed", Player->GetController());
+		Delegate.BindUFunction(this, "RespawnPlayerElapsed", PlayerVic->GetController());
 
 		float RespawnDelay = 2.0f;
 		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, Delegate, RespawnDelay, false);
+		return;
+	}
+	if (AIEnemyVic && PlayerKiller)
+	{
+		ASPlayerState* PS = Cast<ASPlayerState>(PlayerKiller->GetPlayerState());
+		if (PS)
+		{
+			PS->ApplyCreditChange(75.f);
+		}
+		else
+			UE_LOG(LogTemp, Log, TEXT("PlayerState not found!!"));
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim %s, Killer %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));

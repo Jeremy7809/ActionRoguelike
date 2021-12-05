@@ -13,6 +13,7 @@ class USInteractionComponent;
 class USAttributeComponent;
 class UParticleSystemComponent;
 class UAnimMontage;
+class ASPlayerState;
 
 UCLASS()
 class ACTIONROGUELIKE_API ASCharacter : public ACharacter

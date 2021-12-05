@@ -4,6 +4,7 @@
 #include "SHealthPotion.h"
 
 #include "SAttributeComponent.h"
+#include "SPlayerState.h"
 
 
 // Sets default values
@@ -22,11 +23,11 @@ void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 		return;
 	}
 
-	USAttributeComponent* AttributeComp = Cast<USAttributeComponent>(
-		InstigatorPawn->GetComponentByClass(USAttributeComponent::StaticClass()));
-	if (ensure(AttributeComp) && !AttributeComp->HealthMaxed())
+	USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(InstigatorPawn);
+	ASPlayerState* PS = Cast<ASPlayerState>(InstigatorPawn->GetPlayerState());
+	if (ensure(AttributeComp) && !AttributeComp->HealthMaxed() && PS->EnoughCredits(100.0f))
 	{
-		if (AttributeComp->ApplyHealthChange(this, 20.f))
+		if (AttributeComp->ApplyHealthChange(this, 20.f) && PS->ApplyCreditChange(-100.0f))
 		{
 			HideAndCooldownPowerUp();
 		}

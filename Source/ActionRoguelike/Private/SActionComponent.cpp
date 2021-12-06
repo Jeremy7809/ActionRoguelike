@@ -19,7 +19,11 @@ USActionComponent::USActionComponent()
 void USActionComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	for (TSubclassOf<USAction> ActionClass : DefaultActions)
+	{
+		AddAction(ActionClass);
+	}
 }
 
 

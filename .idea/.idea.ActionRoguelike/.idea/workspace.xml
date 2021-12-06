@@ -10,10 +10,13 @@
   <component name="ChangeListManager">
     <list default="true" id="62f54617-099c-4127-9152-81b0785c04e5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ActionRoguelike/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ActionRoguelike/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ActionRoguelike.uproject" beforeDir="false" afterPath="$PROJECT_DIR$/ActionRoguelike.uproject" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Config/DefaultInput.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultInput.ini" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Content/ActionRoguelike/PlayerCharacter.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ActionRoguelike/PlayerCharacter.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SAction.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SAction.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SActionComponent.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SActionComponent.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SCharacter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SCharacter.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SGameplayFunctionLibrary.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SGameplayFunctionLibrary.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Public/SAction.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Public/SAction.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Public/SActionComponent.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Public/SActionComponent.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Public/SCharacter.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Public/SCharacter.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -325,6 +328,7 @@
       <workItem from="1638664998224" duration="2761000" />
       <workItem from="1638667880983" duration="6473000" />
       <workItem from="1638721355069" duration="3295000" />
+      <workItem from="1638746832819" duration="4333000" />
     </task>
     <servers />
   </component>

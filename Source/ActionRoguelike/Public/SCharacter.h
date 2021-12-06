@@ -23,33 +23,16 @@ class ACTIONROGUELIKE_API ASCharacter : public ACharacter
 
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	UAnimMontage* AttackAnim;
 
-	UPROPERTY(EditAnywhere, Category = "Attack")
-	TSubclassOf<AActor> ProjectileClass;
-
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeToHitParamName;
+	
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> BlackholeProjectileClass;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> DashProjectileClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	UParticleSystem* CastVFX;
 	
-	FTimerHandle TimerHandle_PrimaryAttack;
-	FTimerHandle TimerHandle_BlackholeAttack;
-	FTimerHandle TimerHandle_DashAttack;
-	float AttackAnimDelay;
-
-
-public:
-	// Sets default values for this character's properties
-	ASCharacter();
-
-protected:
-
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComp;
 
@@ -64,15 +47,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category= "Components")
 	USActionComponent* ActionComp;
-
-	UPROPERTY(VisibleAnywhere, Category="Effects")
-	FName HandSocketName;
-
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	UFUNCTION()
-	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
 	
 	void MoveForward(float Value);
 	void MoveRight(float Value);
@@ -80,12 +54,9 @@ protected:
 	void SprintStop();
 	void PrimaryAttack();
 	void BlackholeAttack();
-	void BlackholeAttack_TimeElapsed();
-	void PrimaryAttack_TimeElapsed();
-	void PrimaryInteract();
 	void Dash();
-	void Dash_TimeElapsed();
-
+	void PrimaryInteract();
+	
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
 
@@ -94,9 +65,9 @@ protected:
 	virtual FVector GetPawnViewLocation() const override;
 	
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
+	ASCharacter();
+	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 

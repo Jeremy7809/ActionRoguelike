@@ -12,11 +12,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-// Sets default values
 ASCharacter::ASCharacter()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
 	SpringArmComp->bUsePawnControlRotation = true;
@@ -35,8 +32,7 @@ ASCharacter::ASCharacter()
 
 	bUseControllerRotationYaw = false;
 
-	AttackAnimDelay = 0.2f;
-	HandSocketName = "Muzzle_01";
+	TimeToHitParamName = "TimeToHit";
 }
 
 void ASCharacter::PostInitializeComponents()
@@ -49,18 +45,6 @@ void ASCharacter::PostInitializeComponents()
 FVector ASCharacter::GetPawnViewLocation() const
 {
 	return CameraComp->GetComponentLocation();
-}
-
-// Called when the game starts or when spawned
-void ASCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-// Called every frame
-void ASCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -121,47 +105,17 @@ void ASCharacter::SprintStop()
 
 void ASCharacter::PrimaryAttack()
 {
-	PlayAnimMontage(AttackAnim);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ASCharacter::PrimaryAttack_TimeElapsed,
-	                                AttackAnimDelay);
-}
-
-void ASCharacter::PrimaryAttack_TimeElapsed()
-{
-	if (ensure(CastVFX))
-	{
-		UGameplayStatics::SpawnEmitterAttached(CastVFX, GetMesh(), HandSocketName, FVector::ZeroVector,
-		                                       FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
-	}
-	SpawnProjectile(ProjectileClass);
+	ActionComp->StartActionByName(this, "PrimaryAttack");
 }
 
 void ASCharacter::BlackholeAttack()
 {
-	PlayAnimMontage(AttackAnim);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_BlackholeAttack, this, &ASCharacter::BlackholeAttack_TimeElapsed,
-	                                AttackAnimDelay);
+	ActionComp->StartActionByName(this, "BlackholeAttack");
 }
-
-void ASCharacter::BlackholeAttack_TimeElapsed()
-{
-	SpawnProjectile(BlackholeProjectileClass);
-}
-
 
 void ASCharacter::Dash()
 {
-	PlayAnimMontage(AttackAnim);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_DashAttack, this, &ASCharacter::Dash_TimeElapsed,
-	                                AttackAnimDelay);
-}
-
-void ASCharacter::Dash_TimeElapsed()
-{
-	SpawnProjectile(DashProjectileClass);
+	ActionComp->StartActionByName(this, "Dash");
 }
 
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth,
@@ -169,51 +123,12 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 {
 	if (Delta < 0)
 	{
-		GetMesh()->SetScalarParameterValueOnMaterials("TimeToHit", GetWorld()->TimeSeconds);
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
 	}
 	if (NewHealth <= 0.0f && Delta < 0.0f)
 	{
 		APlayerController* PC = Cast<APlayerController>(GetController());
 		DisableInput(PC);
-	}
-}
-
-
-void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
-{
-	if (ensure(ClassToSpawn))
-	{
-		FVector HandLocation = GetMesh()->GetSocketLocation(HandSocketName);
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = this;
-
-		FCollisionShape Shape;
-		Shape.SetSphere(20.0f);
-
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(this);
-
-		FCollisionObjectQueryParams ObjParams;
-		ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-		ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
-		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
-
-		FVector TraceStart = CameraComp->GetComponentLocation();
-
-		FVector TraceEnd = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
-
-		FHitResult Hit;
-		if (GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjParams, Shape, Params))
-		{
-			TraceEnd = Hit.ImpactPoint;
-		}
-
-		FRotator ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
-
-		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
-		GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTM, SpawnParams);
 	}
 }
 

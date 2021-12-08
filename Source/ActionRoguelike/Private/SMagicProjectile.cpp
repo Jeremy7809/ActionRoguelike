@@ -3,10 +3,12 @@
 
 #include "SMagicProjectile.h"
 
+#include "SActionComponent.h"
 #include "SAttributeComponent.h"
 #include "SGameplayFunctionLibrary.h"
 #include "CollisionAnalyzer/Public/ICollisionAnalyzer.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 
@@ -25,15 +27,15 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 {
 	if (OtherActor && OtherActor != GetInstigator())
 	{
-		/*Explode();
-		
-		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(OtherActor);
-		if (AttributeComp)
+		USActionComponent* ActionComp = Cast<USActionComponent>(
+			OtherActor->GetComponentByClass(USActionComponent::StaticClass()));
+		if (ActionComp && ActionComp->ActiveGameplayTags.HasTag(ParryTag))
 		{
-			AttributeComp->ApplyHealthChange(GetInstigator(), -ProjectileDamage);
+			MovementComp->Velocity = -MovementComp->Velocity;
 
-			Destroy();
-		}*/
+			SetInstigator(Cast<APawn>(OtherActor));
+			return;
+		}
 
 		if (USGameplayFunctionLibrary::ApplyDirectionalDamage(GetInstigator(), OtherActor, ProjectileDamage,
 		                                                      SweepResult))

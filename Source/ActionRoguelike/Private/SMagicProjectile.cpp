@@ -4,7 +4,7 @@
 #include "SMagicProjectile.h"
 
 #include "SActionComponent.h"
-#include "SAttributeComponent.h"
+#include "SActionEffect.h"
 #include "SGameplayFunctionLibrary.h"
 #include "CollisionAnalyzer/Public/ICollisionAnalyzer.h"
 #include "Components/SphereComponent.h"
@@ -48,6 +48,11 @@ void ASMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 				UGameplayStatics::PlayWorldCameraShake(GetWorld(), CamShake, OtherActor->GetActorLocation(), 0.f,
 				                                       50000.f, 1,
 				                                       false);
+
+			if(ActionComp)
+			{
+				ActionComp->AddAction(GetInstigator(), BurningActionClass);
+			}
 		}
 	}
 }

@@ -19,7 +19,12 @@ static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("su.SpawnBots"), true, TEXT
 ASGameModeBase::ASGameModeBase()
 {
 	SpawnTimerInterval = 2.0f;
-	SpawnPUCount = 10;
+	CreditsPerKill = 75;
+
+	SpawnPickUpCount = 10;
+	RequiredPickUpDistance = 2000;
+
+	PlayerStateClass = ASPlayerState::StaticClass();
 }
 
 void ASGameModeBase::StartPlay()
@@ -31,7 +36,17 @@ void ASGameModeBase::StartPlay()
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ASGameModeBase::SpawnBotTimerElapsed,
 	                                SpawnTimerInterval, true);
 
-	SpawnPickUps();
+	// Make sure we have assigned at least one pick up class
+	if (ensure(PickUpClasses.Num() > 0))
+	{
+		// Run EQS to find potential power-up spawn locations
+		UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(
+			this, SpawnPickUpQuery, this, EEnvQueryRunMode::AllMatching, nullptr);
+		if (ensure(QueryInstance))
+		{
+			QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnPickUpQueryCompleted);
+		}
+	}
 }
 
 void ASGameModeBase::KillAll()
@@ -43,31 +58,6 @@ void ASGameModeBase::KillAll()
 		if (ensure(AttributeComp) && AttributeComp->IsAlive())
 		{
 			AttributeComp->Kill(this); // pass in player? for kill credit
-		}
-	}
-}
-
-void ASGameModeBase::SpawnPickUps()
-{
-	for (int32 NrOfSpawnedPUs = 0; NrOfSpawnedPUs < SpawnPUCount; NrOfSpawnedPUs++)
-	{
-		if (NrOfSpawnedPUs < 3)
-		{
-			UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(
-				this, SpawnPUQuery, this, EEnvQueryRunMode::RandomBest25Pct, nullptr);
-			if (ensure(QueryInstance))
-			{
-				QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnHealthPUQueryCompleted);
-			}
-		}
-		else
-		{
-			UEnvQueryInstanceBlueprintWrapper* QueryInstance = UEnvQueryManager::RunEQSQuery(
-				this, SpawnPUQuery, this, EEnvQueryRunMode::RandomBest25Pct, nullptr);
-			if (ensure(QueryInstance))
-			{
-				QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ASGameModeBase::OnCoinPUQueryCompleted);
-			}
 		}
 	}
 }
@@ -133,74 +123,93 @@ void ASGameModeBase::OnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* Quer
 	}
 }
 
-void ASGameModeBase::OnHealthPUQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
-                                              EEnvQueryStatus::Type QueryStatus)
-{
-	if (QueryStatus != EEnvQueryStatus::Success)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Spawn Health Pick Up EQS Query Failed!"))
-		return;
-	}
-
-	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
-	if (Locations.IsValidIndex(0))
-	{
-		GetWorld()->SpawnActor<AActor>(HealthPUClass, Locations[0] + SpawnOffset, FRotator::ZeroRotator);
-
-		//Track all the used spawn locations
-		DrawDebugSphere(GetWorld(), Locations[0], 50.0f, 20, FColor::Green, false, 60.0f);
-	}
-}
-
-void ASGameModeBase::OnCoinPUQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
+void ASGameModeBase::OnPickUpQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
                                             EEnvQueryStatus::Type QueryStatus)
 {
 	if (QueryStatus != EEnvQueryStatus::Success)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Spawn Coin Pick Up EQS Query Failed!"))
+		UE_LOG(LogTemp, Warning, TEXT("Spawn bots EQS Query Failed!"));
 		return;
 	}
 
 	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
-	if (Locations.IsValidIndex(0))
-	{
-		GetWorld()->SpawnActor<AActor>(CoinPUClass, Locations[0] + SpawnOffset, FRotator::ZeroRotator);
 
-		//Track all the used spawn locations
-		DrawDebugSphere(GetWorld(), Locations[0], 50.0f, 20, FColor::Green, false, 60.0f);
+	// Keep used locations to easily check distance between points
+	TArray<FVector> UsedLocations;
+
+	int32 SpawnCounter = 0;
+	// Break out if we reached the desired count or if we have no more potential positions remaining
+	while (SpawnCounter < SpawnPickUpCount && Locations.Num() > 0)
+	{
+		// Pick a random location from remaining points
+		int32 RandomLocationIndex = FMath::RandRange(0, Locations.Num() - 1);
+
+		FVector PickedLocation = Locations[RandomLocationIndex];
+		// Remove to avoid picking again
+		Locations.RemoveAt(RandomLocationIndex);
+
+		// Check minimum distance requirement
+		bool bValidLocation = true;
+		for (FVector OtherLocation : UsedLocations)
+		{
+			float DistanceTo = (PickedLocation - OtherLocation).Size();
+
+			if (DistanceTo < RequiredPickUpDistance)
+			{
+				// Show skipped locations due to distance
+				//DrawDebugSphere(GetWorld(), PickedLocation, 50.0f, 20, FColor::Red, false, 10.0f);
+
+				// Too close, skip to next attempt
+				bValidLocation = false;
+				break;
+			}
+		}
+
+		// Failed the distance test
+		if (!bValidLocation)
+		{
+			continue;
+		}
+
+		// Pick a random pickup class
+		int32 RandomClassIndex = FMath::RandRange(0, PickUpClasses.Num() - 1);
+		TSubclassOf<AActor> RandomPickUpClass = PickUpClasses[RandomClassIndex];
+
+		GetWorld()->SpawnActor<AActor>(RandomPickUpClass, PickedLocation + SpawnOffset, FRotator::ZeroRotator);
+
+		// Keep for distance checks
+		UsedLocations.Add(PickedLocation);
+		SpawnCounter++;
 	}
 }
 
 
 void ASGameModeBase::OnActorKilled(AActor* VictimActor, AActor* Killer)
 {
-	ASCharacter* PlayerVic = Cast<ASCharacter>(VictimActor);
-	ASAICharacter* AIEnemyVic = Cast<ASAICharacter>(VictimActor);
-	ASCharacter* PlayerKiller = Cast<ASCharacter>(Killer);
+	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim %s, Killer %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
 
-	if (PlayerVic)
+	// Respawn Players after delay
+	ASCharacter* Player = Cast<ASCharacter>(VictimActor);
+	if (Player)
 	{
 		FTimerHandle TimerHandle_RespawnDelay;
-
 		FTimerDelegate Delegate;
-		Delegate.BindUFunction(this, "RespawnPlayerElapsed", PlayerVic->GetController());
+		Delegate.BindUFunction(this, "RespawnPlayerElapsed", Player->GetController());
 
 		float RespawnDelay = 2.0f;
 		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, Delegate, RespawnDelay, false);
-		return;
-	}
-	if (AIEnemyVic && PlayerKiller)
-	{
-		ASPlayerState* PS = Cast<ASPlayerState>(PlayerKiller->GetPlayerState());
-		if (PS)
-		{
-			PS->ApplyCreditChange(75.f);
-		}
-		else
-			UE_LOG(LogTemp, Log, TEXT("PlayerState not found!!"));
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim %s, Killer %s"), *GetNameSafe(VictimActor), *GetNameSafe(Killer));
+	// Give credits for kill
+	APawn* KillerPawn = Cast<APawn>(Killer);
+	if (KillerPawn)
+	{
+		ASPlayerState* PS = KillerPawn->GetPlayerState<ASPlayerState>();
+		if (PS)
+		{
+			PS->AddCredits(CreditsPerKill);
+		}
+	}
 }
 
 void ASGameModeBase::RespawnPlayerElapsed(AController* Controller)

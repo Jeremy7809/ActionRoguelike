@@ -10,7 +10,7 @@
 // Sets default values
 ASHealthPotion::ASHealthPotion()
 {
-	
+	CreditCost = 100;
 }
 
 void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
@@ -21,12 +21,15 @@ void ASHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 	}
 
 	USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(InstigatorPawn);
-	ASPlayerState* PS = Cast<ASPlayerState>(InstigatorPawn->GetPlayerState());
-	if (ensure(AttributeComp) && !AttributeComp->HealthMaxed() && ensure(PS) && PS->EnoughCredits(100.0f))
+
+	if (ensure(AttributeComp) && !AttributeComp->HealthMaxed())
 	{
-		if (AttributeComp->ApplyHealthChange(this, 20.f) && PS->ApplyCreditChange(-100.0f))
+		if (ASPlayerState* PS = InstigatorPawn->GetPlayerState<ASPlayerState>())
 		{
-			HideAndCooldownPowerUp();
+			if (PS->RemoveCredits(CreditCost) && AttributeComp->ApplyHealthChange(this, 20.f))
+			{
+				HideAndCooldownPowerUp();
+			}
 		}
 	}
 }

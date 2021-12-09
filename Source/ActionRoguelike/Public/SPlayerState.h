@@ -23,25 +23,19 @@ public:
 	FOnCreditsChanged OnCreditsChanged;
 	
 	UFUNCTION(BlueprintCallable, Category= "Credits")
-	bool ApplyCreditChange(float Delta);
+	int32 GetCredits() const;
+
+	UFUNCTION(BlueprintCallable, Category= "Credits")
+	void AddCredits(int32 Delta);
+
+	UFUNCTION(BlueprintCallable, Category= "Credits")
+	bool RemoveCredits(int32 Delta);
 
 	ASPlayerState();
-
-	UFUNCTION(BlueprintCallable)
-	bool CreditsMaxed() const;
-
-	UFUNCTION(BlueprintCallable)
-	bool CreditsNone() const;
-
-	UFUNCTION(BlueprintCallable)
-	bool EnoughCredits(float Cost) const;
 	
 protected:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Credits")
-	float Credits;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Credits")
-	float CreditsMax;
+	UPROPERTY(EditDefaultsOnly, Category= "Credits")
+	int32 Credits;
 	
 };

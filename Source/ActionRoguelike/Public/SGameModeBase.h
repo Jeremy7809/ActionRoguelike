@@ -33,24 +33,24 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	float SpawnTimerInterval;
-
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
+	int32 CreditsPerKill;
+	
 	UPROPERTY(EditDefaultsOnly, Category= "PickUps")
-	TSubclassOf<AActor> HealthPUClass;
-
-	UPROPERTY(EditDefaultsOnly, Category= "PickUps")
-	TSubclassOf<AActor> CoinPUClass;
+	TArray<TSubclassOf<AActor>> PickUpClasses;
 
 	UPROPERTY(EditDefaultsOnly, Category = "PickUps")
-	UEnvQuery* SpawnPUQuery;
+	UEnvQuery* SpawnPickUpQuery;
 
 	UPROPERTY(EditDefaultsOnly, Category = "PickUps")
-	int32 SpawnPUCount;
+	int32 SpawnPickUpCount;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PickUps")
+	float RequiredPickUpDistance;
 
 	UPROPERTY(EditDefaultsOnly, Category = "PickUps")
 	FVector SpawnOffset;
-	
-	UFUNCTION()
-	void SpawnPickUps();
 	
 	UFUNCTION()
 	void SpawnBotTimerElapsed();
@@ -59,10 +59,7 @@ protected:
 	void OnBotQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
 	UFUNCTION()
-	void OnHealthPUQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
-
-	UFUNCTION()
-	void OnCoinPUQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+	void OnPickUpQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 
 	UFUNCTION()
 	void RespawnPlayerElapsed(AController* Controller);

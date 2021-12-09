@@ -7,34 +7,49 @@
 
 ASPlayerState::ASPlayerState()
 {
-	CreditsMax = 1000.0f;
-	Credits = 0.0f;
+	Credits = 0;
 }
 
-bool ASPlayerState::CreditsMaxed() const
+void ASPlayerState::AddCredits(int32 Delta)
 {
-	return Credits == CreditsMax;
+	// Avoid user-error of adding a negative amount or zero
+	if (!ensure(Delta > 0.0f))
+	{
+		return;
+	}
+
+	Credits += Delta;
+
+	OnCreditsChanged.Broadcast(this, Credits, Delta);
 }
 
-bool ASPlayerState::CreditsNone() const
+
+bool ASPlayerState::RemoveCredits(int32 Delta)
 {
-	return Credits == 0.0f;
+	// Avoid user-error of adding a subtracting negative amount or zero
+	if (!ensure(Delta > 0.0f))
+	{
+		return false;
+	}
+
+	if (Credits < Delta)
+	{
+		// Not enough credits available
+		return false;
+	}
+
+	Credits -= Delta;
+
+	OnCreditsChanged.Broadcast(this, Credits, Delta);
+
+	return true;
 }
 
-bool ASPlayerState::EnoughCredits(float Cost) const
+
+int32 ASPlayerState::GetCredits() const
 {
-	return Credits >= Cost;
+	return Credits;
 }
 
-bool ASPlayerState::ApplyCreditChange(float Delta)
-{
-	float OldCredits = Credits;
 
-	Credits = FMath::Clamp(Credits + Delta, 0.0f, CreditsMax);
-
-	float ActualDelta = Credits - OldCredits;
-	OnCreditsChanged.Broadcast(this, Credits, ActualDelta);
-
-	return ActualDelta != 0;
-}
 

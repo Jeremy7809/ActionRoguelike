@@ -7,7 +7,7 @@
 
 ASCoinPickUp::ASCoinPickUp()
 {
-	
+	CreditsAmount = 50;
 }
 
 void ASCoinPickUp::Interact_Implementation(APawn* InstigatorPawn)
@@ -17,12 +17,9 @@ void ASCoinPickUp::Interact_Implementation(APawn* InstigatorPawn)
 		return;
 	}
 
-	ASPlayerState* PS = Cast<ASPlayerState>(InstigatorPawn->GetPlayerState());
-	if (ensure(PS) && !PS->CreditsMaxed())
+	if (ASPlayerState* PS = InstigatorPawn->GetPlayerState<ASPlayerState>())
 	{
-		if (PS->ApplyCreditChange(50.f))
-		{
-			HideAndCooldownPowerUp();
-		}
+		PS->AddCredits(CreditsAmount);
+		HideAndCooldownPowerUp();
 	}
 }

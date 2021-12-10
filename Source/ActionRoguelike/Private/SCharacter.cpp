@@ -3,7 +3,7 @@
 
 #include "SCharacter.h"
 
-#include "DrawDebugHelpers.h"
+#include "SActionEffect.h"
 #include "SActionComponent.h"
 #include "SInteractionComponent.h"
 #include "SAttributeComponent.h"
@@ -41,6 +41,14 @@ void ASCharacter::PostInitializeComponents()
 
 	AttributeComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
 }
+
+void ASCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	ActionComp->AddAction(this, ThornActionClass);
+}
+
 
 FVector ASCharacter::GetPawnViewLocation() const
 {
@@ -123,7 +131,9 @@ void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent*
 {
 	if (Delta < 0)
 	{
+		float RageGain = FMath::Abs(Delta) * 1.5f;
 		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
+		AttributeComp->ApplyRageChange(this, RageGain);
 	}
 	if (NewHealth <= 0.0f && Delta < 0.0f)
 	{

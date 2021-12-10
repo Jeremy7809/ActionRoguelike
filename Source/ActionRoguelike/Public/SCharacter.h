@@ -15,6 +15,7 @@ class USActionComponent;
 class UParticleSystemComponent;
 class UAnimMontage;
 class ASPlayerState;
+class USActionEffect;
 
 UCLASS()
 class ACTIONROGUELIKE_API ASCharacter : public ACharacter
@@ -47,6 +48,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category= "Components")
 	USActionComponent* ActionComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+	TSubclassOf<USActionEffect> ThornActionClass;
 	
 	void MoveForward(float Value);
 	void MoveRight(float Value);
@@ -63,6 +67,8 @@ protected:
 	virtual void PostInitializeComponents() override;
 
 	virtual FVector GetPawnViewLocation() const override;
+
+	virtual void BeginPlay() override;
 	
 public:	
 

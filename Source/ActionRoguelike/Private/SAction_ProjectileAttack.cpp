@@ -3,6 +3,8 @@
 
 #include "SAction_ProjectileAttack.h"
 
+#include "SAttributeComponent.h"
+#include "SBlackholeProjectile.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -11,6 +13,7 @@ USAction_ProjectileAttack::USAction_ProjectileAttack()
 {
 	AttackAnimDelay = 0.2f;
 	HandSocketName = "Muzzle_01";
+	BlackHoleRageCost = 40.0f;
 }
 
 
@@ -73,6 +76,22 @@ void USAction_ProjectileAttack::AttackDelay_Elapsed(ACharacter* InstigatorCharac
 		FRotator ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
 
 		FTransform SpawnTM = FTransform(ProjRotation, HandLocation);
+		
+		if (ActionName == "BlackholeAttack")
+		{
+			USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(InstigatorCharacter);
+			if (AttributeComp->GetRage() >= BlackHoleRageCost)
+			{
+				AttributeComp->ApplyRageChange(InstigatorCharacter, -BlackHoleRageCost);
+				GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Not enough Rage!");
+				StopAction(InstigatorCharacter); 
+				return;
+			}
+		}
 		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
 	}
 

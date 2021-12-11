@@ -52,8 +52,30 @@ void ASAICharacter::SetTargetActor(AActor* NewTarget)
 void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
 	SetTargetActor(Pawn);
-	DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 4.0f, true);
+	if (PlayerSpotted == nullptr)
+	{
+		PlayerSpotted = CreateWidget<USWorldUserWidget>(GetWorld(), PlayerSpottedWidgetClass);
+		if (PlayerSpotted)
+		{
+			PlayerSpotted->AttachedActor = this;
+			PlayerSpotted->AddToViewport();
+			FTimerHandle TimerHandle_WidgetDelay;
+			FTimerDelegate Delegate;
+			Delegate.BindUFunction(this, "WidgetDelay_Elapsed", this);
+
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle_WidgetDelay, Delegate, 2.0f, false);
+		}
+	}
 }
+
+void ASAICharacter::WidgetDelay_Elapsed()
+{
+	if (PlayerSpotted)
+	{
+		PlayerSpotted->RemoveFromParent();
+	}
+}
+
 
 void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth,
                                     float Delta)

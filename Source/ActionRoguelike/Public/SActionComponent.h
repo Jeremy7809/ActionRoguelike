@@ -50,5 +50,5 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	bool CheckActions(TSubclassOf<USAction> ActionToCheck);
 };

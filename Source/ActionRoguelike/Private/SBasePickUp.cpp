@@ -17,6 +17,8 @@ ASBasePickUp::ASBasePickUp()
 	MeshComp->SetupAttachment(RootComponent);
 
 	RespawnTime = 10.f;
+
+	SetReplicates(true);
 }
 
 void ASBasePickUp::Interact_Implementation(APawn* InstigatorPawn)

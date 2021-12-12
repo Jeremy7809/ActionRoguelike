@@ -29,19 +29,34 @@ public:
 	USAttributeComponent();
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Attributes")
+
+	// EditAnywhere - edit in BP editor and per-instance in level
+	// VisibleAnywhere - 'read-only' in editor and level. (Use for Components)
+	// EditDefaultsOnly - hide variables per-instance, edit in BP editor only
+	// VisibleDefaultsOnly - 'read-only' access for variable, only in BP editor (uncommon)
+	// EditInstanceOnly - allow only editing of instance (eg. when placed in level)
+	// --
+	// BlueprintReadOnly - read-only in the Blueprint scripting (does not affect 'details'-panel)
+	// BlueprintReadWrite - read-write access in Blueprints
+	// --
+	// Category = "" - display only for detail panels and blueprint context menu
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category= "Attributes")
 	float Health;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category= "Attributes")
 	float HealthMax;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category= "Attributes")
 	float Rage;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category= "Attributes")
 	float RageMax;
 
 	// HealthMax, Stamina, Strength
+
+	UFUNCTION(NetMulticast, Reliable) // @FIXME: mark as unreliable once we moved the 'state' out of SCharacter
+	void MulticastHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
 
 public:
 

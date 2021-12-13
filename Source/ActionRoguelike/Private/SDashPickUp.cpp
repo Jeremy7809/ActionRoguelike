@@ -2,7 +2,6 @@
 
 
 #include "SDashPickUp.h"
-
 #include "SAction.h"
 #include "SActionComponent.h"
 
@@ -12,19 +11,24 @@ ASDashPickUp::ASDashPickUp()
 
 void ASDashPickUp::Interact_Implementation(APawn* InstigatorPawn)
 {
-	if (!ensure(InstigatorPawn))
+	if (!ensure(InstigatorPawn && ActionGranted))
 	{
 		return;
 	}
 
 	USActionComponent* ActionComp = Cast<USActionComponent>(
 		InstigatorPawn->GetComponentByClass(USActionComponent::StaticClass()));
-	if (ActionComp && ensure(ActionGranted))
+	if (ActionComp)
 	{
-		if (!ActionComp->CheckActions(ActionGranted))
+		if (ActionComp->CheckActions(ActionGranted))
 		{
-			ActionComp->AddAction(InstigatorPawn, ActionGranted);
-			HideAndCooldownPowerUp();
+			FString DebugMsg = FString::Printf(TEXT("Action '%s' already known."), *GetNameSafe(ActionGranted));
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, DebugMsg);
+			return;
 		}
+		
+		// Give new ability
+		ActionComp->AddAction(InstigatorPawn, ActionGranted);
+		HideAndCooldownPowerUp();
 	}
 }

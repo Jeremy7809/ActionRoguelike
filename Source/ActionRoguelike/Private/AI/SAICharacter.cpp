@@ -30,6 +30,7 @@ ASAICharacter::ASAICharacter()
 	GetMesh()->SetGenerateOverlapEvents(true);
 
 	TimeToHitParamName = "TimeToHit";
+	TargetActorKey = "TargetActor";
 }
 
 void ASAICharacter::PostInitializeComponents()
@@ -40,42 +41,40 @@ void ASAICharacter::PostInitializeComponents()
 	AttributeComp->OnHealthChanged.AddDynamic(this, &ASAICharacter::OnHealthChanged);
 }
 
+AActor* ASAICharacter::GetTargetActor() const
+{
+	AAIController* AIC = Cast<AAIController>(GetController());
+	if (AIC)
+	{
+		return Cast<AActor>(AIC->GetBlackboardComponent()->GetValueAsObject(TargetActorKey));
+	}
+
+	return nullptr;
+}
+
 void ASAICharacter::SetTargetActor(AActor* NewTarget)
 {
 	AAIController* AIC = Cast<AAIController>(GetController());
 	if (AIC)
 	{
-		AIC->GetBlackboardComponent()->SetValueAsObject("TargetActor", NewTarget);
+		AIC->GetBlackboardComponent()->SetValueAsObject(TargetActorKey, NewTarget);
 	}
 }
 
 void ASAICharacter::OnPawnSeen(APawn* Pawn)
 {
-	SetTargetActor(Pawn);
-	if (PlayerSpotted == nullptr)
+	if (GetTargetActor() != Pawn)
 	{
-		PlayerSpotted = CreateWidget<USWorldUserWidget>(GetWorld(), PlayerSpottedWidgetClass);
-		if (PlayerSpotted)
+		SetTargetActor(Pawn);
+		
+		USWorldUserWidget* NewWidget = CreateWidget<USWorldUserWidget>(GetWorld(), PlayerSpottedWidgetClass);
+		if (NewWidget)
 		{
-			PlayerSpotted->AttachedActor = this;
-			PlayerSpotted->AddToViewport();
-			FTimerHandle TimerHandle_WidgetDelay;
-			FTimerDelegate Delegate;
-			Delegate.BindUFunction(this, "WidgetDelay_Elapsed", this);
-
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle_WidgetDelay, Delegate, 2.0f, false);
+			NewWidget->AttachedActor = this;
+			NewWidget->AddToViewport(10);
 		}
 	}
 }
-
-void ASAICharacter::WidgetDelay_Elapsed()
-{
-	if (PlayerSpotted)
-	{
-		PlayerSpotted->RemoveFromParent();
-	}
-}
-
 
 void ASAICharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth,
                                     float Delta)

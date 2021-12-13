@@ -17,14 +17,18 @@ class ACTIONROGUELIKE_API USEffectThorns : public USActionEffect
 	GENERATED_BODY()
 
 public:
+	
+	USEffectThorns();
 
 	void StartAction_Implementation(AActor* Instigator) override;
-	
+
 	void StopAction_Implementation(AActor* Instigator) override;
 
-protected:
 
+protected:
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
-	
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effect")
+	float ReflectFraction;
 };

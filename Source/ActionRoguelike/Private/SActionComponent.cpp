@@ -36,17 +36,17 @@ void USActionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMsg);
 }
 
-bool USActionComponent::CheckActions(TSubclassOf<USAction> ActionToCheck)
+USAction* USActionComponent::CheckActions(TSubclassOf<USAction> ActionToCheck) const
 {
 	for (USAction* Action : Actions)
 	{
-		if (Action->GetClass() == ActionToCheck)
+		if (Action && Action->IsA(ActionToCheck))
 		{
-			return true;
+			return Action;
 		}
 	}
 
-	return false;
+	return nullptr;
 }
 
 void USActionComponent::AddAction(AActor* Instigator, TSubclassOf<USAction> ActionClass)

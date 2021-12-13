@@ -4,21 +4,26 @@
 #include "SEffectThorns.h"
 
 #include "SAttributeComponent.h"
-#include "SCharacter.h"
+#include "SActionComponent.h"
+#include "SGameplayFunctionLibrary.h"
 #include "AI/SAICharacter.h"
+
+USEffectThorns::USEffectThorns()
+{
+	ReflectFraction = 0.2f;
+
+	Duration = 0.0f;
+	Period = 0.0f;
+}
 
 void USEffectThorns::StartAction_Implementation(AActor* Instigator)
 {
 	Super::StartAction_Implementation(Instigator);
 
-	ASCharacter* Player = Cast<ASCharacter>(Instigator);
-	if (Player)
+	USAttributeComponent* Attributes = USAttributeComponent::GetAttributes(GetOwningComponent()->GetOwner());
+	if (Attributes)
 	{
-		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(Player);
-		if (AttributeComp)
-		{
-			AttributeComp->OnHealthChanged.AddDynamic(this, &USEffectThorns::OnHealthChanged);
-		}
+		Attributes->OnHealthChanged.AddDynamic(this, &USEffectThorns::OnHealthChanged);
 	}
 }
 
@@ -26,29 +31,32 @@ void USEffectThorns::StopAction_Implementation(AActor* Instigator)
 {
 	Super::StopAction_Implementation(Instigator);
 
-	ASCharacter* Player = Cast<ASCharacter>(Instigator);
-	if (Player)
+
+	USAttributeComponent* Attributes = USAttributeComponent::GetAttributes(GetOwningComponent()->GetOwner());
+	if (Attributes)
 	{
-		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(Player);
-		if (AttributeComp)
-		{
-			AttributeComp->OnHealthChanged.RemoveDynamic(this, &USEffectThorns::OnHealthChanged);
-		}
+		Attributes->OnHealthChanged.RemoveDynamic(this, &USEffectThorns::OnHealthChanged);
 	}
 }
 
-void USEffectThorns::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
+void USEffectThorns::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth,
+                                     float Delta)
 {
-	int32 DamageBack = Delta * 0.6f;
+	AActor* OwningActor = GetOwningComponent()->GetOwner();
 
-	ASAICharacter* AI = Cast<ASAICharacter>(InstigatorActor);
-	if (AI)
+	if (Delta < 0.0f && OwningActor != InstigatorActor)
 	{
-		USAttributeComponent* AttributeComp = USAttributeComponent::GetAttributes(AI);
-		if (AttributeComp)
+		// Round to nearest to avoid 'ugly' damage numbers and tiny reflections
+		int32 ReflectedAmount = FMath::RoundToInt(Delta * ReflectFraction);
+		if (ReflectedAmount == 0)
 		{
-			AttributeComp->ApplyHealthChange(InstigatorActor, DamageBack);
+			return;
 		}
+
+		// Flip to positive, so we don't end up healing ourselves when passed into damage
+		ReflectedAmount = FMath::Abs(ReflectedAmount);
+
+		// Return damage sender...
+		USGameplayFunctionLibrary::ApplyDamage(OwningActor, InstigatorActor, ReflectedAmount);
 	}
 }
-

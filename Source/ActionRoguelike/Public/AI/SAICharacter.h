@@ -25,8 +25,6 @@ public:
 protected:
 	
 	USWorldUserWidget* ActiveHealthBar;
-
-	USWorldUserWidget* PlayerSpotted;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
@@ -36,6 +34,11 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeToHitParamName;
+
+	UPROPERTY(VisibleAnywhere, Category = "Blackboard")
+	FName TargetActorKey;
+
+	AActor* GetTargetActor() const;
 	
 	void SetTargetActor(AActor* NewTarget);
 	
@@ -55,7 +58,5 @@ protected:
 
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
-
-	UFUNCTION()
-	void WidgetDelay_Elapsed();
+	
 };

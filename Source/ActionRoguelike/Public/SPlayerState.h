@@ -9,6 +9,8 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCreditsChanged, ASPlayerState*,
 											  OwningState, float, NewCredit, float, Delta);
 
+class USSaveGame;
+
 /**
  * 
  */
@@ -32,6 +34,12 @@ public:
 	bool RemoveCredits(int32 Delta);
 
 	ASPlayerState();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void SavePlayerState(USSaveGame* SaveObject);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void LoadPlayerState(USSaveGame* SaveObject);
 	
 protected:
 

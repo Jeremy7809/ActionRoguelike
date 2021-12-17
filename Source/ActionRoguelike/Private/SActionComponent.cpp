@@ -17,8 +17,6 @@ USActionComponent::USActionComponent()
 }
 
 
-
-
 // Called when the game starts
 void USActionComponent::BeginPlay()
 {
@@ -146,7 +144,7 @@ bool USActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 				{
 					ServerStopAction(Instigator, ActionName);
 				}
-				
+
 				Action->StopAction(Instigator);
 				return true;
 			}

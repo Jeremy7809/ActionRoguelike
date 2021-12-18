@@ -65,13 +65,13 @@ void ASGameModeBase::StartPlay()
 
 void ASGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
-	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
-
 	ASPlayerState* PS = NewPlayer->GetPlayerState<ASPlayerState>();
 	if (PS)
 	{
 		PS->LoadPlayerState(CurrentSaveGame);
 	}
+
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 }
 
 void ASGameModeBase::KillAll()
@@ -86,7 +86,6 @@ void ASGameModeBase::KillAll()
 		}
 	}
 }
-
 
 
 void ASGameModeBase::SpawnBotTimerElapsed()
@@ -280,8 +279,8 @@ void ASGameModeBase::WriteSaveGame()
 
 		// Pass the array to fill with data from Actor
 		FMemoryWriter MemWriter(ActorData.ByteData);
-		
-		FObjectAndNameAsStringProxyArchive Ar(MemWriter,true);
+
+		FObjectAndNameAsStringProxyArchive Ar(MemWriter, true);
 		// Find only variables with UPROPERTY(SaveGame)
 		Ar.ArIsSaveGame = true;
 		// Converts Actor's SaveGame UPROPERTIES into binary array
@@ -289,7 +288,7 @@ void ASGameModeBase::WriteSaveGame()
 
 		CurrentSaveGame->SavedActors.Add(ActorData);
 	}
-	
+
 	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SlotName, 0);
 }
 
@@ -321,13 +320,13 @@ void ASGameModeBase::LoadSaveGame()
 
 					FMemoryReader MemReader(ActorData.ByteData);
 
-					FObjectAndNameAsStringProxyArchive Ar(MemReader,true);
+					FObjectAndNameAsStringProxyArchive Ar(MemReader, true);
 					Ar.ArIsSaveGame = true;
 					// Convert binary array back into actor's variables
 					Actor->Serialize(Ar);
 
 					ISGameplayInterface::Execute_OnActorLoaded(Actor);
-					
+
 					break;
 				}
 			}

@@ -43,7 +43,12 @@ public:
 	
 protected:
 
-	UPROPERTY(EditDefaultsOnly, Category= "Credits")
+	UPROPERTY(EditDefaultsOnly, ReplicatedUsing="OnRep_Credits", Category= "Credits")
 	int32 Credits;
+
+	// OnRep_ can use a parameter containing the ' old value' of the variable it is bound to. Very useful in this
+	// case to figure out the 'delta'
+	UFUNCTION()
+	void OnRep_Credits(int32 OldCredits);
 	
 };

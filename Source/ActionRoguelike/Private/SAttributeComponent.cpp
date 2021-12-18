@@ -20,7 +20,6 @@ USAttributeComponent::USAttributeComponent()
 	SetIsReplicatedByDefault(true);
 }
 
-
 bool USAttributeComponent::Kill(AActor* InstigatorActor)
 {
 	return ApplyHealthChange(InstigatorActor, -GetHealthMax());
@@ -101,7 +100,7 @@ bool USAttributeComponent::ApplyRageChange(AActor* InstigatorActor, float Delta)
 	Rage = FMath::Clamp(Rage + Delta, 0.0f, RageMax);
 
 	float ActualDelta = Rage - OldRage;
-	OnRageChanged.Broadcast(InstigatorActor, this, Rage, ActualDelta);
+	MulticastRageChanged(InstigatorActor, Rage, ActualDelta);
 
 	return ActualDelta != 0;
 }
@@ -129,6 +128,11 @@ bool USAttributeComponent::IsActorAlive(AActor* Actor)
 void USAttributeComponent::MulticastHealthChanged_Implementation(AActor* InstigatorActor, float NewHealth, float Delta)
 {
 	OnHealthChanged.Broadcast(InstigatorActor, this, NewHealth, Delta);
+}
+
+void USAttributeComponent::MulticastRageChanged_Implementation(AActor* InstigatorActor, float NewRage, float Delta)
+{
+	OnRageChanged.Broadcast(InstigatorActor, this, NewRage, Delta);
 }
 
 void USAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

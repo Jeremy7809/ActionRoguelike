@@ -2,7 +2,10 @@
 
 
 #include "SBasePickUp.h"
+
+#include "MovieSceneSequenceID.h"
 #include "Components/SphereComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ASBasePickUp::ASBasePickUp()
@@ -40,8 +43,21 @@ void ASBasePickUp::HideAndCooldownPowerUp()
 
 void ASBasePickUp::SetPowerUpState(bool bNewIsActive)
 {
-	SetActorEnableCollision(bNewIsActive);
-
-	//Set visibility on root and all children
-	RootComponent->SetVisibility(bNewIsActive, true);
+	bIsActive = bNewIsActive;
+	OnRep_IsActive();
 }
+
+void ASBasePickUp::OnRep_IsActive()
+{
+	SetActorEnableCollision(bIsActive);
+	// Set visibility on root and all children
+	RootComponent->SetVisibility(bIsActive, true);
+}
+
+void ASBasePickUp::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASBasePickUp, bIsActive);
+}
+

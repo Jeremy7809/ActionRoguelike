@@ -42,14 +42,6 @@ void ASCharacter::PostInitializeComponents()
 	AttributeComp->OnHealthChanged.AddDynamic(this, &ASCharacter::OnHealthChanged);
 }
 
-void ASCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-
-	ActionComp->AddAction(this, ThornActionClass);
-}
-
-
 FVector ASCharacter::GetPawnViewLocation() const
 {
 	return CameraComp->GetComponentLocation();

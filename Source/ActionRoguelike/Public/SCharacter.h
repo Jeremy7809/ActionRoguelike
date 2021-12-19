@@ -67,8 +67,6 @@ protected:
 	virtual void PostInitializeComponents() override;
 
 	virtual FVector GetPawnViewLocation() const override;
-
-	virtual void BeginPlay() override;
 	
 public:	
 

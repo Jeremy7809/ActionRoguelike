@@ -29,6 +29,11 @@ void ASBasePickUp::Interact_Implementation(APawn* InstigatorPawn)
 	//logic derived in classes
 }
 
+FText ASBasePickUp::GetInteractText_Implementation(APawn* InstigatorPawn)
+{
+	return FText::GetEmpty();
+}
+
 void ASBasePickUp::ShowPowerUp()
 {
 	SetPowerUpState(true);

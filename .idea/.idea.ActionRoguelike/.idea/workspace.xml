@@ -11,11 +11,6 @@
     <list default="true" id="62f54617-099c-4127-9152-81b0785c04e5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ActionRoguelike/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ActionRoguelike/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Config/DefaultGame.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultGame.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/ActionRoguelike/GameModeBP.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ActionRoguelike/GameModeBP.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Content/ActionRoguelike/UI/EffectSlot_Widget.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/ActionRoguelike/UI/EffectSlot_Widget.uasset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SGameModeBase.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Private/SGameModeBase.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Public/SAction.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Public/SAction.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Source/ActionRoguelike/Public/SGameModeBase.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/ActionRoguelike/Public/SGameModeBase.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -362,7 +357,8 @@
       <workItem from="1639999801568" duration="2281000" />
       <workItem from="1640004261137" duration="670000" />
       <workItem from="1640302283813" duration="2026000" />
-      <workItem from="1640523623915" duration="4515000" />
+      <workItem from="1640523623915" duration="4573000" />
+      <workItem from="1640563871046" duration="466000" />
     </task>
     <servers />
   </component>
